@@ -63,12 +63,39 @@
     canvas {
       display: none;
     }
+
+    .love-letter {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 1.5rem; /* Smaller size */
+      color: #fff;
+      margin-top: 30px;
+      text-align: left;
+      width: 80%;
+      max-height: 300px; /* Set max height */
+      margin: 20px auto;
+      border: 2px solid #ff4b5c;
+      padding: 20px;
+      border-radius: 15px;
+      background-color: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      overflow-y: auto; /* Enable scroll */
+    }
+
   </style>
 </head>
 <body>
   <div class="container">
     <div class="heart" onclick="capturePhoto()">❤️</div>
     <h1>I <span>Love</span> You</h1>
+
+    <!-- Love Letter Section -->
+    <div class="love-letter">
+      <p>প্রিয়তম,</p>
+      <p> যেদিন তোমার সঙ্গে প্রথম দেখা হয়েছিল, আমার হৃদয় যেন বুঝে গিয়েছিল যে আমাদের মধ্যে কিছু বিশেষ রয়েছে। তুমি যে ভাবে আমাকে অনুভব করাতে, তা ভাষায় বর্ণনা করা সম্ভব নয়। প্রতিটি দিন, প্রতিটি মুহূর্ত তোমার সঙ্গে কাটানো যেন একটি সুন্দর স্বপ্নের মতো।</p>
+      <p>যতক্ষণ আমি এটি লিখছি, ততক্ষণ আমি ভবিষ্যতটাকে ভাবছি এবং সমস্ত সম্ভাবনাগুলোর কথা ভাবছি, যেগুলো আমাদের জন্য অপেক্ষা করছে। তুমি আমার হৃদয়, আমার আত্মা, আমার সবকিছু। আমি তোমাকে এমনভাবে ভালোবাসি যা শব্দের মাধ্যমে প্রকাশ করা সম্ভব নয়। আমি কৃতজ্ঞ প্রতিটি মুহূর্তের জন্য যা আমরা একসাথে কাটাচ্ছি।</p>
+      <p>তোমায় অনেক </p>
+      <p><strong>ভালোবাসি</strong></p>
+    </div>
 
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
